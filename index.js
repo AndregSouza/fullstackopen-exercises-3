@@ -36,10 +36,10 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const person = persons.find(persons => persons.id === id)
+    const singlePerson = persons.find(persons => persons.id === id)
 
-    if (person) {
-        response.json(persons)
+    if (singlePerson) {
+        response.json(singlePerson)
     } else {
         response.status(404).end()
     }
