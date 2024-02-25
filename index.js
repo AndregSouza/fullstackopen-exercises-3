@@ -31,15 +31,14 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    
     response.json(persons)
 })
 
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const persons = persons.find(persons => persons.id === id)
+    const person = persons.find(persons => persons.id === id)
 
-    if (persons) {
+    if (person) {
         response.json(persons)
     } else {
         response.status(404).end()
@@ -55,12 +54,12 @@ app.post('/api/persons', (request, response) => {
     const maxId = persons.length > 0
       ? Math.max(...persons.map(n => n.id)) 
       : 0
-  
+
     const persons = request.body
     persons.id = maxId + 1
-  
+
     persons = persons.concat(persons)
-  
+
     response.json(persons)
   })
 
@@ -74,5 +73,5 @@ app.delete('/api/persons/:id', (request, response) => {
 
 const PORT = 3001
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
