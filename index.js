@@ -1,6 +1,20 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 app.use(express.json())
+
+const cors = require('cors')
+
+app.use(cors())
+
+morgan.token('req-body', (req) => {
+    if (req.method === 'POST') {
+      return JSON.stringify(req.body);
+    }
+    return '';
+  });
+
+  app.use(morgan(':method :url :status :response-time ms - :res[content-length] - :req-body'))
 
 let persons = [
     {
@@ -25,42 +39,39 @@ let persons = [
     }
 ]
 
-app.get('/', (request, response) => {
-    console.log(persons);
-    response.send('<h1>Hello World!</h1>')
+app.get('/', function (req, res) {
+    res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', (request, response) => {
-    response.json(persons)
+app.get('/api/persons', function (req, res) {
+    res.json(persons)
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
+app.get('/api/persons/:id', function (req, res) {
+    const id = Number(req.params.id)
     const singlePerson = persons.find(persons => persons.id === id)
 
     if (singlePerson) {
-        response.json(singlePerson)
+        res.json(singlePerson)
     } else {
-        response.status(404).end()
+        res.status(404).end()
     }
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', function (req, res) {
     const date = Date()
-    response.send(`<p>Phonebook has info for ${persons.length} people </p> <p>${date}</p>`)
+    res.send(`<p>Phonebook has info for ${persons.length} people </p> <p>${date}</p>`)
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', function (req, res) {
 
-    const person = request.body
+    const person = req.body
 
     const isNameIncluded = persons.some(object => object.name === person.name);
 
     if (person.name === "" || isNameIncluded == true || person.number === "") {
-        response.status(400).send({ error: 'names must be unique' })
+        res.status(400).send({ error: 'names must be unique' })
     }
-
-    console.log(duplicates, person.name);
 
     const maxId = persons.length > 0
         ? Math.max(...persons.map(n => n.id))
@@ -71,16 +82,18 @@ app.post('/api/persons', (request, response) => {
 
     persons = persons.concat(person)
 
-    response.json(persons)
+    res.json(persons)
 })
 
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
+app.delete('/api/persons/:id', function (req, res) {
+    const id = Number(req.params.id)
     persons = persons.filter(persons => persons.id !== id)
 
-    response.status(204).end()
+    res.status(204).end()
+
 })
+
 
 const PORT = 3001
 app.listen(PORT, () => {
